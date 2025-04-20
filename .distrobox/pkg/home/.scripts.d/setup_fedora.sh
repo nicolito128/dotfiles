@@ -1,5 +1,9 @@
 #!/usr/bin/bash
 
+echo "Updating..."
+
+sudo dnf up -y --refresh
+
 echo "Installing compilers..."
 
 sudo dnf install -y go gcc g++

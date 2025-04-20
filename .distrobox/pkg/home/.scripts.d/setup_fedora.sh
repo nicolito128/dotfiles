@@ -6,7 +6,7 @@ sudo dnf up -y --refresh
 
 echo "Installing compilers..."
 
-sudo dnf install -y go gcc g++
+sudo dnf install -y go gcc g++ gdb glibc-static git gh
 
 echo "Adding VSCode repository..."
 

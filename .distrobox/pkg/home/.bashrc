@@ -9,6 +9,11 @@ fi
 if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]; then
     PATH="$HOME/.local/bin:$HOME/bin:$PATH"
 fi
+
+if ! [[ "$PATH" =~ "$HOME/.scripts.d:" ]]; then
+    PATH="$HOME/.scripts.d:$PATH"
+fi
+
 export PATH
 
 # User specific aliases and functions

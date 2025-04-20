@@ -1,0 +1,4 @@
+alias ls='ls -hF --color=auto'
+alias la='ls -ahF --color=auto'
+alias dir='ls --color=auto --format=long'
+alias grep='grep --color=auto'

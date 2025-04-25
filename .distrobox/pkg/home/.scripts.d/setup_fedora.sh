@@ -1,5 +1,8 @@
 #!/usr/bin/bash
 
+# Setting up parallel downloads
+echo -e "[main]\nmax_parallel_downloads=15\nfastestmirror=True" | sudo tee /etc/dnf/dnf.conf > /dev/null
+
 echo "Updating..."
 
 sudo dnf up -y --refresh

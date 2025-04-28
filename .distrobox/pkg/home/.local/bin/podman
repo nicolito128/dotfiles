@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+
+distrobox-host-exec /usr/bin/podman "$@"

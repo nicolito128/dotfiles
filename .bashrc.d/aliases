@@ -14,4 +14,4 @@ alias tbx='toolbox'
 alias dbx='distrobox'
 
 # Containers
-inpkg='distrobox-enter pkg -e tmux'
+alias inpkg='distrobox-enter pkg -e tmux'

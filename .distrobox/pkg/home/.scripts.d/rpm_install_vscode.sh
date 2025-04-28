@@ -11,7 +11,7 @@ echo \
 echo "Installing VSCode..."
 
 dnf check-update
-sudo dnf install code
+sudo dnf install -y code
 
 echo "Exporting Code application"
 

@@ -18,7 +18,7 @@ sudo dnf up -y --refresh
 
 echo "Installing tools and compilers..."
 
-sudo dnf install -y go gcc g++ gdb git gh
+sudo dnf install -y go gcc g++ gdb git gh tmux
 
 # Visual Studio Code
 

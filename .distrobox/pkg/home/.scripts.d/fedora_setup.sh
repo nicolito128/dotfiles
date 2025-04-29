@@ -18,8 +18,4 @@ sudo dnf up -y --refresh
 
 echo "Installing tools and compilers..."
 
-sudo dnf install -y go gcc g++ gdb git gh tmux
-
-# Visual Studio Code
-
-. rpm_install_vscode.sh
+sudo dnf install -y go gcc g++ gdb git gh tmux neovim

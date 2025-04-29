@@ -76,6 +76,7 @@ require('mason-lspconfig').setup({
 -- Ref: https://github.com/echasnovski/mini.nvim
 require('mini.pairs').setup()
 require('mini.move').setup()
+require('mini.git').setup()
 
 -- Auto completion with cmp
 local cmp = require('cmp')

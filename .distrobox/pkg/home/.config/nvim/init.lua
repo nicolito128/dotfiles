@@ -48,6 +48,9 @@ Plug 'ryanoasis/vim-devicons'
 -- Syntax Highlight
 Plug 'nvim-treesitter/nvim-treesitter'
 
+-- Utils
+Plug 'echasnovski/mini.nvim'
+
 vim.call('plug#end')
 
 -- Setting theme
@@ -69,22 +72,21 @@ require('mason-lspconfig').setup({
   }
 })
 
+-- mini.nvim
+-- Ref: https://github.com/echasnovski/mini.nvim
+require('mini.pairs').setup()
+require('mini.move').setup()
+
 -- Auto completion with cmp
 local cmp = require('cmp')
 local luasnip = require('luasnip')
 
--- Highlights
-require('nvim-treesitter.configs').setup({
-  -- A list of parser names, or "all" (the listed parsers MUST always be installed)
-  ensure_installed = {'bash', 'c', 'html', 'css', 'javascript', 'typescript', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'go', 'elixir', 'erlang', 'zig'},
-
-  sync_install = false,
-
-  highlight = {
-    enable = true,
-    additional_vim_regex_highlighting = false,
-  },
-})
+local select_opts = {behavior = cmp.SelectBehavior.Select}
+local has_words_before = function()
+  if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then return false end
+  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+  return col ~= 0 and vim.api.nvim_buf_get_text(0, line-1, 0, line-1, col, {})[1]:match("^%s*$") == nil
+end
 
 -- See :help cmp-config
 cmp.setup({
@@ -164,6 +166,19 @@ cmp.setup({
         fallback()
       end
     end, {'i', 's'}),
+  },
+})
+
+-- Highlights
+require('nvim-treesitter.configs').setup({
+  -- A list of parser names, or "all" (the listed parsers MUST always be installed)
+  ensure_installed = {'bash', 'c', 'html', 'css', 'javascript', 'typescript', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'go', 'elixir', 'erlang', 'zig'},
+
+  sync_install = false,
+
+  highlight = {
+    enable = true,
+    additional_vim_regex_highlighting = false,
   },
 })
 

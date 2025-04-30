@@ -50,6 +50,9 @@ Plug 'nvim-treesitter/nvim-treesitter'
 
 -- Utils
 Plug 'echasnovski/mini.nvim'
+Plug "OXY2DEV/markview.nvim"
+Plug "OXY2DEV/oops.nvim"
+Plug "OXY2DEV/patterns.nvim"
 
 vim.call('plug#end')
 
@@ -72,11 +75,15 @@ require('mason-lspconfig').setup({
   }
 })
 
--- mini.nvim
--- Ref: https://github.com/echasnovski/mini.nvim
+-- Utils
+--- Ref: https://github.com/echasnovski/mini.nvim
 require('mini.pairs').setup()
 require('mini.move').setup()
 require('mini.git').setup()
+
+require('markview').setup()
+require('oops').setup()
+require('patterns').setup()
 
 -- Auto completion with cmp
 local cmp = require('cmp')
@@ -89,7 +96,7 @@ local has_words_before = function()
   return col ~= 0 and vim.api.nvim_buf_get_text(0, line-1, 0, line-1, col, {})[1]:match("^%s*$") == nil
 end
 
--- See :help cmp-config
+--- See :help cmp-config
 cmp.setup({
   snippet = {
     expand = function(args)

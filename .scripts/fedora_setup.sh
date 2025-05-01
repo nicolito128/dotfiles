@@ -10,6 +10,9 @@ sudo dnf up -y --refresh
 
 echo "Installing tools and compilers..."
 
-sudo dnf install -y go gcc g++ rust gdb glibc-static git gh tmux neovim fastfetch
+sudo dnf install -y go gcc g++ gdb glibc-static git gh tmux neovim fzf fastfetch
+
+# Terminal file manager
+env CGO_ENABLED=0 go install -ldflags="-s -w" github.com/gokcehan/lf@latest
 
 exit 0

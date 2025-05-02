@@ -5,8 +5,12 @@ if [ -f /etc/bashrc ]; then
     . /etc/bashrc
 fi
 
-# User variables
-export EDITOR="/usr/bin/nvim"
+# User editor
+if which nvim >/dev/null 2>&1; then
+  export EDITOR="/usr/bin/nvim"
+else
+  export EDITOR="/usr/bin/nano"
+fi
 
 # User specific environment
 if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]; then

@@ -7,9 +7,9 @@ fi
 
 # User editor
 if which nvim >/dev/null 2>&1; then
-  export EDITOR="/usr/bin/nvim"
+    export EDITOR="$( which nvim )"
 else
-  export EDITOR="/usr/bin/nano"
+    export EDITOR="$( which nano )"
 fi
 
 # User specific environment

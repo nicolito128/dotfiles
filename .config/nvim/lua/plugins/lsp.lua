@@ -15,14 +15,15 @@ return {
                     'lua_ls',
                     'gopls',
                     'clangd',
-                    'elp',
-                    'elixirls',
+                    'elp', -- erlang
+                    'lexical', -- elixir
                     'ts_ls',
-                    'pylsp',
+                    'pylsp', -- python
                     'phpactor',
-                    'marksman',
-                    'taplo',
+                    'marksman', -- markdown
+                    'taplo', -- toml
                     'julials',
+                    'html',
                     'cssls',
                     'yamlls',
                 },

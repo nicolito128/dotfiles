@@ -34,11 +34,15 @@ fi
 unset rc
 
 # Go
-export GOPATH=$HOME/go
-export PATH="$HOME/go/bin:$PATH"
+if [ -d ~/go ]; then
+    export GOPATH=$HOME/go
+    export PATH="$HOME/go/bin:$PATH"
+fi
 
 # asdf
-export PATH="$HOME/.asdf/shims:$PATH"
+if [ -d ~/.asdf ]; then
+    export PATH="$HOME/.asdf/shims:$PATH"
+fi
 
 if which fastfetch >/dev/null 2>&1; then
   fastfetch

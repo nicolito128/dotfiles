@@ -11,4 +11,4 @@ alias ffetch='fastfetch'
 alias dbx='distrobox'
 
 # Containers
-alias inpkg='distrobox-enter pkg -e tmux source-file ~/.tmux.conf'
+alias inpkg='distrobox-enter pkg -e tmux'

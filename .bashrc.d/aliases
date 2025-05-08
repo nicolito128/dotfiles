@@ -7,11 +7,8 @@ alias grep='grep --color=auto'
 # Fastfetch
 alias ffetch='fastfetch'
 
-# Toolbox
-alias tbx='toolbox'
-
 # Distrobox
 alias dbx='distrobox'
 
 # Containers
-alias inpkg='distrobox-enter pkg -e tmux'
+alias inpkg='distrobox-enter pkg -e tmux source-file ~/.tmux.conf'

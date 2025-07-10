@@ -1,12 +1,5 @@
 return {
     {
-        'OXY2DEV/markview.nvim',
-        lazy = false,
-        dependencies = {
-            'saghen/blink.cmp',
-        },
-    },
-    {
         'nvim-treesitter/nvim-treesitter',
         dependencies = { 'OXY2DEV/markview.nvim' },
         build = ':TSUpdate',

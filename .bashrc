@@ -4,6 +4,9 @@ case $- in
       *) return;;
 esac
 
+# User editor
+export EDITOR='nvim'
+
 # don't put duplicate lines or lines starting with space in the history.
 HISTCONTROL=ignoreboth
 
@@ -66,10 +69,15 @@ if [ -d ~/.asdf ]; then
 fi
 
 # fnm
-FNM_PATH="/home/nicolito/.local/share/fnm"
+export FNM_PATH="/home/nicolito/.local/share/fnm"
 if [ -d "$FNM_PATH" ]; then
   export PATH="$FNM_PATH:$PATH"
   eval "`fnm env`"
+fi
+
+export DOTNET_ROOT="$HOME/dotnet"
+if [ -d "$DOTNET_ROOT" ]; then
+  export PATH="$DOTNET_ROOT:$PATH"
 fi
 
 if which fastfetch >/dev/null 2>&1; then

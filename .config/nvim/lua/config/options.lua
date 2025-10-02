@@ -1,3 +1,6 @@
+vim.g.mapleader = "\\"
+vim.g.maplocalleader = "\\"
+
 vim.opt.expandtab = true -- Convert tabs to spaces
 vim.opt.shiftwidth = 4   -- Amount to indent with << and >>
 vim.opt.tabstop = 4      -- How many spaces are shown per Tab

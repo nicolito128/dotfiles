@@ -7,6 +7,10 @@ mset("n", "-", "<CMD>Oil --float<CR>", { desc = "Open parent directory with Oil"
 -- Copy to clipboard
 mset('v', "<leader>y", '"+y')
 
+-- Fast move with ctrl-up/down
+vim.api.nvim_set_keymap('n', '<C-Down>', '10j', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<C-Up>', '10k', { noremap = true, silent = true })
+
 -- Don't replace the content of buffer when pasting
 mset("x", "p", "pgv\" . v:register . 'y'", { expr = true })
 

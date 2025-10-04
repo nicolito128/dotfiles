@@ -29,7 +29,18 @@ shopt -s checkwinsize
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
-export PS1='\[\e]0;\w\a\]\n\[\e[34m\]\u@\h\[\e[m\]:\[\e[33m\]\W\[\e[m\]\$ '
+# Enable git branch in prompt
+if [ -f /usr/share/git/completion/git-prompt.sh ]; then
+    . /usr/share/git/completion/git-prompt.sh
+    GIT_PS1_SHOWDIRTYSTATE=1
+    GIT_PS1_SHOWSTASHSTATE=1
+    GIT_PS1_SHOWUNTRACKEDFILES=1
+    GIT_PS1_SHOWUPSTREAM="auto"
+fi
+
+# Bash Prompt
+PROMPT_COMMAND='if [ -n "$(git branch --show-current 2>/dev/null)" ]; then PS1_CMD1=" [$(git branch --show-current)]"; else PS1_CMD1=""; fi'
+PS1='\[\033[38;2;166;227;161m\]\u\[\033[0m\]@\[\033[38;2;137;180;250m\]\h\[\033[0m\]:\[\033[38;2;249;226;175m\]\W\[\033[0m\]\[\033[38;2;205;214;244m\]\[\033[38;2;245;194;231m\]${PS1_CMD1}\[\033[38;2;205;214;244m\] \$ \[\033[0m\]'
 
 # Alias definitions.
 if [ -f ~/.bash_aliases ]; then

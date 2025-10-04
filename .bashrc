@@ -5,7 +5,11 @@ case $- in
 esac
 
 # User editor
-export EDITOR='nvim'
+if command -v nvim &> /dev/null; then
+    export EDITOR='nvim'
+else
+    export EDITOR='nano'
+fi
 
 # don't put duplicate lines or lines starting with space in the history.
 HISTCONTROL=ignoreboth
@@ -41,45 +45,41 @@ if ! shopt -oq posix; then
 fi
 
 # User binaries
-if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]; then
-    export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+{
+    declare -r FNM_PATH="$HOME/.local/share/fnm"
+    declare -r DOTNET_ROOT="$HOME/dotnet"
+} &>/dev/null
+
+user_bin_dirs=(
+    "$HOME/.local/bin"
+    "$HOME/bin"
+    "$HOME/.scripts"
+    "$HOME/go/bin"
+    "$HOME/.govm/shim"
+    "$HOME/.cargo/env"
+    "$HOME/.asdf/shims"
+    "$FNM_PATH"
+    "$DOTNET_ROOT"
+)
+
+# Add directories to PATH if they exist
+for dir in "${user_bin_dirs[@]}"; do
+    if [ -d "$dir" ] && [[ ":$PATH:" != *":$dir:"* ]]; then
+        export PATH="$dir:$PATH"
+    fi
+done
+
+# Rust load
+if [ -d "$HOME/.cargo" ]; then
+    [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 fi
 
-# Custom scripts
-if ! [[ "$PATH" =~ "$HOME/.scripts:" ]]; then
-    export PATH="$HOME/.scripts:$PATH"
-fi
-
-# Go
-if [ -d ~/go ]; then
-    export PATH="$HOME/go/bin:$PATH"
-fi
-if [ -d ~/.govm ]; then
-    export PATH="$HOME/.govm/shim:$PATH"
-fi
-
-# Rust
-if [ -d ~/.cargo ]; then
-    . "$HOME/.cargo/env"
-fi
-
-# asdf
-if [ -d ~/.asdf ]; then
-    export PATH="$HOME/.asdf/shims:$PATH"
-fi
-
-# fnm
-export FNM_PATH="/home/nicolito/.local/share/fnm"
+# FNM load
 if [ -d "$FNM_PATH" ]; then
-  export PATH="$FNM_PATH:$PATH"
   eval "`fnm env`"
 fi
 
-export DOTNET_ROOT="$HOME/dotnet"
-if [ -d "$DOTNET_ROOT" ]; then
-  export PATH="$DOTNET_ROOT:$PATH"
-fi
-
-if which fastfetch >/dev/null 2>&1; then
-  fastfetch
+# Run fastfetch if available
+if command -v fastfetch >/dev/null; then
+    fastfetch
 fi

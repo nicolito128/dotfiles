@@ -1,4 +1,12 @@
 return {
+	settings = {
+		Lua = {
+			diagnostics = {
+				globals = { 'vim' },
+			},
+		},
+	},
+
 	cmd = {
 		'lua-language-server',
 	},

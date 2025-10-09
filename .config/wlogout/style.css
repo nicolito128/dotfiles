@@ -1,0 +1,71 @@
+@define-color bg_color #1A1B26;
+@define-color fg_color #C0CAF5;
+@define-color tray_color #414868;
+@define-color accent_color #9ECE6A;
+@define-color highlight_color #7AA2F7;
+@define-color invert_color #1A1B26;
+@define-color caution_color #E0AF68;
+@define-color urgent_color #F7768E;
+@define-color middle_color #9ECE6A;
+@define-color first_right_color #7DCFFF;
+@define-color middle_right_color #F7768E;
+@define-color last_right_color #BB9AF7;
+
+
+* {
+    border: none;
+    font-family: Adwaita Sans;
+    min-height: 0;
+    min-width: 0;
+    padding: 4px 4px 4px 4px;
+    margin: 0 0 0 0;
+    border-radius: 16px;
+    font-size: 14px;
+    background-image: none;
+}
+
+window {
+    background: @bg_color;
+}
+
+button {
+    background-color: @bg_color;
+    color: @fg_color;
+    border-style: none;
+    border-width: 4px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 20%;
+    margin: 4px 4px 4px 4px;
+}
+
+button:focus,
+button:active {
+    background-color: @bg_color;
+    color: @fg_color;
+    outline-style: none;
+}
+
+button:hover {
+    background-color: @highlight_color;
+}
+
+#lock {
+    background-image: image(url("./icons/lock.png"));
+}
+
+#logout {
+    background-image: image(url("./icons/logout.png"));
+}
+
+#suspend {
+    background-image: image(url("./icons/sleep.png"));
+}
+
+#shutdown {
+    background-image: image(url("./icons/power.png"));
+}
+
+#reboot {
+    background-image: image(url("./icons/restart.png"));
+}

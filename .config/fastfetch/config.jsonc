@@ -59,9 +59,6 @@
                 {
                         "type": "memory",
                 },
-                {
-                        "type": "media",
-                },
                 "break",
                 {
                         "type": "colors",

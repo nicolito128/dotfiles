@@ -1,7 +1,7 @@
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
-      *) return;;
+*) return;;
 esac
 
 # User editor
@@ -57,10 +57,7 @@ if ! shopt -oq posix; then
 fi
 
 # User binaries
-{
-    declare -r FNM_PATH="$HOME/.local/share/fnm"
-    declare -r DOTNET_ROOT="$HOME/dotnet"
-} &>/dev/null
+export FNM_PATH="$HOME/.local/share/fnm"
 
 user_bin_dirs=(
     "$HOME/.local/bin"
@@ -71,7 +68,6 @@ user_bin_dirs=(
     "$HOME/.cargo/env"
     "$HOME/.asdf/shims"
     "$FNM_PATH"
-    "$DOTNET_ROOT"
 )
 
 # Add directories to PATH if they exist
@@ -80,6 +76,9 @@ for dir in "${user_bin_dirs[@]}"; do
         export PATH="$dir:$PATH"
     fi
 done
+
+# ~/opt source
+. ~/.opt
 
 # Rust load
 if [ -d "$HOME/.cargo" ]; then

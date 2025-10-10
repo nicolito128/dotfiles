@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+
+export DOTNET_ROOT="$HOME/opt/dotnet"
+
+dirs=(
+    "$DOTNET_ROOT"
+)
+
+# Add to PATH
+for dir in "${dirs[@]}"; do
+    if [ -d "$dir" ] && [[ ":$PATH:" != *":$dir:"* ]]; then
+        export PATH="$dir:$PATH"
+    fi
+done
+

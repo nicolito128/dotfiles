@@ -10,6 +10,7 @@ return {
         'lua_ls',
         'gopls',
         'clangd',
+        'mesonlsp',
         'elp',      -- erlang
         'lexical',  -- elixir
         'ts_ls',

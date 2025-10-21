@@ -56,8 +56,9 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# User binaries
+# Binaries and other scripts
 export FNM_PATH="$HOME/.local/share/fnm"
+export PHP_INI_SCAN_DIR="$HOME/.config/herd-lite/bin"
 
 user_bin_dirs=(
     "$HOME/.local/bin"
@@ -68,6 +69,7 @@ user_bin_dirs=(
     "$HOME/.cargo/env"
     "$HOME/.asdf/shims"
     "$FNM_PATH"
+    "$PHP_INI_SCAN_DIR"
 )
 
 # Add directories to PATH if they exist
@@ -77,8 +79,10 @@ for dir in "${user_bin_dirs[@]}"; do
     fi
 done
 
-# ~/opt source
-. ~/.opt
+# Homebrew specific
+if [ -d "/home/linuxbrew/.linuxbrew/bin" ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
 
 # Rust load
 if [ -d "$HOME/.cargo" ]; then
@@ -90,7 +94,13 @@ if [ -d "$FNM_PATH" ]; then
   eval "`fnm env`"
 fi
 
+# ~/opt source
+if [ -f ~/.opt ]; then
+    source "$HOME/.opt"
+fi
+
 # Run fastfetch if available
 if command -v fastfetch >/dev/null; then
     fastfetch
 fi
+

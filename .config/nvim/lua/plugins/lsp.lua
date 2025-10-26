@@ -7,17 +7,37 @@ return {
     },
     opts = {
       ensure_installed = {
+        -- Lua
         'lua_ls',
+        -- Go
         'gopls',
+        -- Rust
+        'rust_analyzer',
+        -- Bash
+        'bashls',
+        -- C, Meson, Clang
         'clangd',
         'mesonlsp',
-        'elp',      -- erlang
-        'lexical',  -- elixir
-        'ts_ls',
-        'pylsp',    -- python
-        'marksman', -- markdown
+        -- BEAM (Erlang, Elixir)
+        'elp',
+        'elixirls',
+        -- Python
+        'pylsp',
+        -- Markdown
+        'marksman',
+        -- JSON
+        'jsonls',
+        -- Web (PHP, HTML, CSS, JS/TS, ...)
+        'phpactor',
+        'laravell-ls',
         'html',
         'cssls',
+        'ts_ls',
+        'vue_ls',
+        'tailwindcss',
+        'eslint',
+        -- Containers
+        'dockerls',
       },
     },
   },

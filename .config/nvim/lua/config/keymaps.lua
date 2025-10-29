@@ -25,3 +25,14 @@ mset('n', '<leader>_', 'ebcw_', { noremap = true, desc = 'Replace word with _ (t
 mset('n', '<leader>q', '<CMD>bnext<CR>', { noremap = true, desc = 'Go to the next buffer' })
 mset('n', '<leader>w', '<CMD>bprevious<CR>', { noremap = true, desc = 'Go to the previous buffer' })
 mset('n', '<leader>e', '<CMD>bdelete<CR>', { noremap = true, desc = 'Delete the current buffer' })
+
+-- Toggle diagnostics
+local diagnostic_enabled = true
+
+local function toggle_diagnostics()
+  diagnostic_enabled = not diagnostic_enabled
+  vim.diagnostic.enable(diagnostic_enabled)
+  print("Diagnostics " .. (diagnostic_enabled and "enabled" or "disabled"))
+end
+
+mset('n', '<leader>d', toggle_diagnostics, { noremap = true, silent = true })

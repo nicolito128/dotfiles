@@ -29,7 +29,7 @@ return {
         'jsonls',
         -- Web (PHP, HTML, CSS, JS/TS, ...)
         'phpactor',
-        'laravell-ls',
+        'laravel_ls',
         'html',
         'cssls',
         'ts_ls',

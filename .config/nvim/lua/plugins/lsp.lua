@@ -33,7 +33,6 @@ return {
         'html',
         'cssls',
         'ts_ls',
-        'vue-language-server',
         'tailwindcss',
         'eslint',
         -- Containers

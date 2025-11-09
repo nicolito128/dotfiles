@@ -8,8 +8,8 @@ mset("n", "-", "<CMD>Oil --float<CR>", { desc = "Open parent directory with Oil"
 mset('v', "<leader>y", '"+y')
 
 -- Fast move with ctrl-up/down
-mset('n', '<C-Down>', '10j', { noremap = true, silent = true })
-mset('n', '<C-Up>', '10k', { noremap = true, silent = true })
+mset('n', '<C-Down>', '5j', { noremap = true, silent = true })
+mset('n', '<C-Up>', '5k', { noremap = true, silent = true })
 
 -- Don't replace the content of buffer when pasting
 mset("x", "p", "pgv\" . v:register . 'y'", { expr = true })

@@ -57,7 +57,9 @@ if ! shopt -oq posix; then
 fi
 
 # Profile
-. ~/.bash_profile
+if [ -f ~/.bash_profile ]; then
+    . ~/.bash_profile
+fi
 
 # Binaries and other scripts
 export FNM_PATH="$HOME/.local/share/fnm"
@@ -94,7 +96,7 @@ fi
 
 # FNM load
 if [ -d "$FNM_PATH" ]; then
-  eval "`fnm env`"
+    eval $(fnm env)
 fi
 
 # ~/opt source

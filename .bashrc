@@ -56,6 +56,9 @@ if ! shopt -oq posix; then
   fi
 fi
 
+# Profile
+. ~/.bash_profile
+
 # Binaries and other scripts
 export FNM_PATH="$HOME/.local/share/fnm"
 export PHP_INI_SCAN_DIR="$HOME/.config/herd-lite/bin"

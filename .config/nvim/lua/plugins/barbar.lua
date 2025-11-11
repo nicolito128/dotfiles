@@ -1,9 +1,12 @@
 return {
   'romgrk/barbar.nvim',
+  version = '^1.0.0',
+
   dependencies = {
     'lewis6991/gitsigns.nvim',
     'nvim-tree/nvim-web-devicons',
   },
+
   init = function()
     vim.g.barbar_auto_setup = false
     local map = vim.api.nvim_set_keymap
@@ -51,5 +54,4 @@ return {
     animation = false,
     insert_at_start = true,
   },
-  version = '^1.0.0',
 }

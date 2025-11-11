@@ -1,5 +1,9 @@
 return {
-    { 'L3MON4D3/LuaSnip', keys = {} },
+    {
+        'L3MON4D3/LuaSnip',
+        version = '^2.0.0',
+        keys = {},
+    },
     {
         'zbirenbaum/copilot.lua',
         config = function()
@@ -15,11 +19,13 @@ return {
     },
     {
         'saghen/blink.cmp',
+        version = '^1.0.0',
+
         dependencies = {
             'rafamadriz/friendly-snippets',
             'giuxtaposition/blink-cmp-copilot',
         },
-        version = '^1.0.0',
+
         config = function()
             require('blink.cmp').setup({
                 snippets = { preset = 'luasnip' },

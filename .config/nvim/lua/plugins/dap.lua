@@ -1,12 +1,15 @@
 return {
   { -- From TJ DeVries
     'mfussenegger/nvim-dap',
+    version = '^0.10.0',
+
     dependencies = {
       'leoluz/nvim-dap-go',
       'rcarriga/nvim-dap-ui',
       'nvim-neotest/nvim-nio',
       'williamboman/mason.nvim',
     },
+
     config = function()
       local dap = require 'dap'
       local ui = require 'dapui'

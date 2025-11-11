@@ -1,7 +1,5 @@
 return {
     'numToStr/Comment.nvim',
-    opts = { },
-    config = function()
-        require('Comment').setup()
-    end
+    version = '^0.8.0',
+    opts = {},
 }

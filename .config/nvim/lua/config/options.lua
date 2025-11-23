@@ -23,11 +23,8 @@ vim.opt.cursorline = true
 -- Store undos between sessions
 vim.opt.undofile = true
 
--- Enable mouse mode, can be useful for resizing splits for example!
+-- Enable mouse mode
 vim.opt.mouse = "a"
-
--- Don't show the mode, since it's already in the status line
-vim.opt.showmode = false
 
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
 vim.opt.ignorecase = true
@@ -43,8 +40,8 @@ vim.opt.splitbelow = true
 -- Sets how neovim will display certain whitespace characters in the editor.
 --  See `:help 'list'`
 --  and `:help 'listchars'`
+vim.opt.listchars = "tab:» ,trail:·,nbsp:␣"
 vim.opt.list = true
-vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 5

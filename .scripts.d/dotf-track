@@ -3,7 +3,7 @@
 while IFS= read -r path; do
     if [ -e "$path" ]; then
         echo "Tracking changes for: $path"
-        dotup "$path"
+        dotf-up "$path"
     else
         echo "Path does not exist: $path"
     fi

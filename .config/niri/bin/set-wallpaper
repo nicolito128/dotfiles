@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+PICTURES_PATH="$HOME/Pictures"
+BG_NAME_FILE="$HOME/.config/niri/var/wallpaper"
+
+if [ -d "$HOME/Imágenes" ]; then
+    PICTURES_PATH="$HOME/Imágenes"
+fi
+
+bg_name="default"
+if [ -f "$BG_NAME_FILE" ]; then
+    bg_name=$(cat $BG_NAME_FILE)
+fi
+
+bg_folder="Wallpapers"
+
+# TODO: Add random wallpaper selection
+
+# Parse command-line arguments
+while (( "$#" )); do
+    case "$1" in
+        -bn)
+            bg_name="$2"
+            ;;
+        -bf)
+            bg_folder="$2"
+            ;;
+        -p)
+            PICTURES_PATH="$2"
+            ;;
+        *) 
+            echo "Error: Invalid argument"
+            ;;
+    esac
+    shift 2
+done
+
+
+swaybg -m fill -i "$PICTURES_PATH/$bg_folder/$bg_name"

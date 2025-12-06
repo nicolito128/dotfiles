@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+LOCK_SCREEN_WALLPAPER="$HOME/.config/niri/var/lockscreen"
+
+BG_PATH="$HOME/Pictures/Wallpapers/lockscreen" 
+if [ -f "$LOCK_SCREEN_WALLPAPER" ]; then
+    BG_PATH=$(cat $LOCK_SCREEN_WALLPAPER)
+fi
+
+while (( "$#" )); do
+    case "$1" in
+        -i)
+            BG_PATH="$2"
+            ;;
+        *) 
+            echo "Error: Invalid argument"
+            ;;
+    esac
+    shift 2
+done
+
+
+swaylock -f -s fill -i $BG_PATH

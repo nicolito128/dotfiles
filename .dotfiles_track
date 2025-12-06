@@ -1,0 +1,15 @@
+.config/fastfetch/
+.config/fuzzel/
+.config/kitty/
+.config/lf/
+.config/mpv/
+.config/niri/
+.config/nvim/
+.config/waybar/
+.config/wlogout/
+.scripts.d/
+.bash_aliases
+.bashrc
+.opt
+.tmux.conf
+.dotfiles_track

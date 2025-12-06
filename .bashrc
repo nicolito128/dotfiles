@@ -68,7 +68,7 @@ export PHP_INI_SCAN_DIR="$HOME/.config/herd-lite/bin"
 user_bin_dirs=(
     "$HOME/.local/bin"
     "$HOME/bin"
-    "$HOME/.scripts"
+    "$HOME/.scripts.d"
     "$HOME/go/bin"
     "$HOME/.govm/shim"
     "$HOME/.cargo/env"

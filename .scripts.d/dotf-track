@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if [ ! -f "$HOME/.dotfiles_track" ]; then
+    echo "No .dotfiles_track file found in home directory."
+    exit 1
+fi
+
 while IFS= read -r path; do
     if [ -e "$path" ]; then
         echo "Tracking changes for: $path"

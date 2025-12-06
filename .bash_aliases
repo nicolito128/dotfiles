@@ -7,5 +7,5 @@ alias dir='ls -a --color=auto --format=long'
 # grep
 alias grep='grep --color=auto'
 
-# dotfiles
-alias config='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME' 
+# dotfiles repository
+alias dotf='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME' 

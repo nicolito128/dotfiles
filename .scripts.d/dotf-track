@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+while IFS= read -r path; do
+    if [ -e "$path" ]; then
+        echo "Tracking changes for: $path"
+        dotup "$path"
+    else
+        echo "Path does not exist: $path"
+    fi
+done < "$HOME/.dotfiles_track"

@@ -12,4 +12,5 @@
 .bashrc
 .opt
 .tmux.conf
+.gitconfig
 .dotfiles_track

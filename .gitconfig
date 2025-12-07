@@ -11,6 +11,7 @@
 	last = log -1 HEAD
 	logr = log --reverse
 	staash = stash --all
+	st = status
 [rerere]
 	enabled = true
 [branch]

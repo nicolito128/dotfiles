@@ -7,7 +7,7 @@
 .config/nvim/
 .config/waybar/
 .config/wlogout/
-.scripts.d/
+.local/bin/
 .bash_aliases
 .bashrc
 .opt

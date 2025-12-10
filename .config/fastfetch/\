@@ -68,11 +68,7 @@
         ],
         "logo": {
                 "type": "auto",
-                // "source": "~/.config/fastfetch/logo.txt",
-                "color": {
-                        "1": "red",
-                        "2": "white"
-                },
+                "source": "~/.config/fastfetch/logo.txt",
                 "padding": {
                         "left": 2,
                         "right": 2,

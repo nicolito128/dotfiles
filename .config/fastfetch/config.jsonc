@@ -4,7 +4,7 @@
                 "break",
                 {
                         "type": "title",
-                        "format": "┌────「 {#1}{user-name} | {host-name}{#} 」─────────────────────┐"
+                        "format": "┌────「 {#1}{user-name} | {host-name}{#} 」──────────────────┐"
                 },
                 "break",
                 {
@@ -18,12 +18,12 @@
                 },
                 {
                         "type": "cpu",
-                        "key": "cpu",
+                        "key": "cpu"
                 },
                 {
                         "type": "gpu",
                         "key": "{icon} gpu",
-                        "format": "{name}",
+                        "format": "{name}"
                 },
                 {
                         "type": "de"
@@ -45,37 +45,37 @@
                 {
                         "type": "packages",
                         "format": "{}",
-                        "key": "pkgs  ",
+                        "key": "pkgs  "
                 },
                 {
                         "type": "uptime",
                         "format": "{2}h {3}m",
-                        "key": "uptime",
+                        "key": "uptime"
                 },
                 {
                         "type": "datetime",
                         "format": "{hour}:{minute} {year}"
                 },
                 {
-                        "type": "memory",
+                        "type": "memory"
                 },
                 "break",
                 {
                         "type": "colors",
                         "symbol": "square",
-                        "paddingLeft": 16
-                },
+                        "paddingLeft": 0
+                }
         ],
         "logo": {
                 "type": "auto",
-                // "source": "~/.config/fastfetch/logo.txt",
+                "source": "~/.config/fastfetch/logo.txt",
                 "color": {
                         "1": "red",
                         "2": "white"
                 },
                 "padding": {
                         "left": 2,
-                        "right": 2,
+                        "right": 4,
                         "top": 1
                 }
         },

@@ -5,25 +5,11 @@ return {
         keys = {},
     },
     {
-        'zbirenbaum/copilot.lua',
-        config = function()
-            require('copilot').setup({
-                suggestion = { enabled = false },
-                panel = { enabled = false },
-            })
-        end,
-    },
-    {
-        'giuxtaposition/blink-cmp-copilot',
-        after = { 'copilot.lua' },
-    },
-    {
         'saghen/blink.cmp',
         version = '^1.0.0',
 
         dependencies = {
             'rafamadriz/friendly-snippets',
-            'giuxtaposition/blink-cmp-copilot',
         },
 
         config = function()
@@ -35,17 +21,10 @@ return {
                     nerd_font_variant = 'normal',
                 },
                 sources = {
-                    default = { 'lsp', 'path', 'snippets', 'buffer', 'copilot' },
+                    default = { 'lsp', 'path', 'snippets', 'buffer' },
                     providers = {
                         cmdline = {
                             min_keyword_length = 2,
-                        },
-                        copilot = {
-                            name = 'copilot',
-                            module = 'blink-cmp-copilot',
-                            score_offset = 75,
-                            async = true,
-                            timeout_ms = 3000,
                         },
                     },
                 },

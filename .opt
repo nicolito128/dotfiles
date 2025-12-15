@@ -5,6 +5,7 @@ export DOTNET_ROOT="$HOME/opt/dotnet"
 dirs=(
     "$DOTNET_ROOT"
     "$HOME/opt/odin"
+    "$HOME/opt/jdk-21/bin"
 )
 
 # Add to PATH

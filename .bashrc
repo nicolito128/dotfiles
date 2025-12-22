@@ -64,6 +64,7 @@ fi
 # Binaries and other scripts
 export FNM_PATH="$HOME/.local/share/fnm"
 export PHP_INI_SCAN_DIR="$HOME/.config/herd-lite/bin"
+export PNPM_HOME="$HOME/.local/share/pnpm"
 
 user_bin_dirs=(
     "$HOME/.local/bin"
@@ -75,6 +76,7 @@ user_bin_dirs=(
     "$HOME/.asdf/shims"
     "$FNM_PATH"
     "$PHP_INI_SCAN_DIR"
+    "$PNPM_HOME"
 )
 
 # Add directories to PATH if they exist

@@ -10,8 +10,12 @@ mset('v', "<leader>y", '"+y')
 -- Fast move with ctrl-up/down
 mset('n', '<C-Down>', '5j', { noremap = true, silent = true })
 mset('n', '<C-Up>', '5k', { noremap = true, silent = true })
+
 mset('n', '<C-j>', '5j', { noremap = true, silent = true })
 mset('n', '<C-k>', '5k', { noremap = true, silent = true })
+
+mset('n', '<C-l>', '5l', { noremap = true, silent = true })
+mset('n', '<C-h>', '5h', { noremap = true, silent = true })
 
 -- Don't replace the content of buffer when pasting
 mset("x", "p", "pgv\" . v:register . 'y'", { expr = true })

@@ -1,0 +1,21 @@
+[
+	"\n",
+	"${spwd}",
+	" ",
+	"fg:cyan",
+	"${git_branch}",
+	{
+		"git_status_noclean": [
+			"fg:red",
+			"  "
+		]
+	},
+	{
+		"git_status_clean": [
+			"fg:green",
+			"  "
+		]
+	},
+	"fg:yellow",
+	"\n λ "
+]

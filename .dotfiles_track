@@ -8,7 +8,7 @@
 .config/waybar/
 .config/wlogout/
 .config/distrobox/
-.config/starship.toml
+.config/grompt.json
 .local/bin/
 .bash_aliases
 .bashrc

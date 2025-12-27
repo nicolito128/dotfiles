@@ -1,17 +1,19 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 export DOTNET_ROOT="$HOME/opt/dotnet"
+export ODIN_USER_PATH="$HOME/opt/odin"
+# export JAVA_USER_JDK_PATH="$HOME/opt/jdk-21/bin"
 
 dirs=(
     "$DOTNET_ROOT"
-    "$HOME/opt/odin"
-    "$HOME/opt/jdk-21/bin"
+    "$ODIN_USER_PATH"
+    "$JAVA_USER_JDK_PATH"
 )
 
 # Add to PATH
 for dir in "${dirs[@]}"; do
-    if [ -d "$dir" ] && [[ ":$PATH:" != *":$dir:"* ]]; then
-        export PATH="$dir:$PATH"
+    if [[ -d "$dir" ]] && [[ ":$PATH:" != *":$dir:"* ]]; then
+        export PATH="$PATH:$dir"
     fi
 done
 

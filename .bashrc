@@ -35,7 +35,11 @@ shopt -s checkwinsize
 # Old Prompt END
 
 # Starship prompt
-eval "$(starship init bash)"
+# eval "$(starship init bash)"
+
+# Grompt Prompt
+# Link: https://codeberg.org/estebxn/grompt
+PROMPT_COMMAND='PS1="$(grompt | perl -pe '\''s/\x1b\[([0-9;]*m)/\\[\\e[$1\\]/g'\'')"'
 
 # Alias definitions.
 if [ -f "$HOME/.bash_aliases" ]; then

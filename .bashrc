@@ -9,7 +9,7 @@ if command -v nvim &> /dev/null; then
     export EDITOR='nvim'
     export MANPAGER='nvim +Man!'
 else
-    export EDITOR='nano'
+    export EDITOR='vim'
 fi
 
 # don't put duplicate lines or lines starting with space in the history.
@@ -29,22 +29,17 @@ shopt -s checkwinsize
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
-# Enable git branch in prompt
-if [ -f /usr/share/git/completion/git-prompt.sh ]; then
-    . /usr/share/git/completion/git-prompt.sh
-    GIT_PS1_SHOWDIRTYSTATE=1
-    GIT_PS1_SHOWSTASHSTATE=1
-    GIT_PS1_SHOWUNTRACKEDFILES=1
-    GIT_PS1_SHOWUPSTREAM="auto"
-fi
+# Old Prompt START
+# PROMPT_COMMAND='if [ -n "$(git branch --show-current 2>/dev/null)" ]; then PS1_CMD1=" [$(git branch --show-current)]"; else PS1_CMD1=""; fi'
+# PS1='\[\033[38;2;166;227;161m\]\u\[\033[0m\]@\[\033[38;2;137;180;250m\]\h\[\033[0m\]:\[\033[38;2;249;226;175m\]\W\[\033[0m\]\[\033[38;2;205;214;244m\]\[\033[38;2;245;194;231m\]${PS1_CMD1}\[\033[38;2;205;214;244m\] \$ \[\033[0m\]'
+# Old Prompt END
 
-# Bash Prompt
-PROMPT_COMMAND='if [ -n "$(git branch --show-current 2>/dev/null)" ]; then PS1_CMD1=" [$(git branch --show-current)]"; else PS1_CMD1=""; fi'
-PS1='\[\033[38;2;166;227;161m\]\u\[\033[0m\]@\[\033[38;2;137;180;250m\]\h\[\033[0m\]:\[\033[38;2;249;226;175m\]\W\[\033[0m\]\[\033[38;2;205;214;244m\]\[\033[38;2;245;194;231m\]${PS1_CMD1}\[\033[38;2;205;214;244m\] \$ \[\033[0m\]'
+# Starship prompt
+eval "$(starship init bash)"
 
 # Alias definitions.
-if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
+if [ -f "$HOME/.bash_aliases" ]; then
+    source "$HOME/.bash_aliases"
 fi
 
 # enable programmable completion features
@@ -58,7 +53,7 @@ fi
 
 # Profile
 if [ -f ~/.bash_profile ]; then
-    . ~/.bash_profile
+    source "$HOME/.bash_profile"
 fi
 
 # Binaries and other scripts
@@ -98,7 +93,7 @@ fi
 
 # FNM load
 if [ -d "$FNM_PATH" ]; then
-    eval $(fnm env)
+    eval "$(fnm env)"
 fi
 
 # ~/opt source

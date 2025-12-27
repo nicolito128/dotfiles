@@ -1,10 +1,11 @@
 return {
     -- {
     -- 'p00f/alabaster.nvim',
+    -- version = 'main',
     -- config = function()
     -- vim.cmd('silent! colorscheme alabaster')
     -- end
-    -- }
+    -- },
     {
         'vague2k/vague.nvim',
         lazy = false,

@@ -1,5 +1,8 @@
 [
 	"\n",
+	"bg:black",
+	"fg:red",
+	" ↣ ",
 	"${spwd}",
 	" ",
 	"fg:cyan",
@@ -16,6 +19,17 @@
 			"  "
 		]
 	},
+	"c:reset",
+	"\n\n",
+	"bg:black",
+	"fg:green",
+	" Σ ",
+	"$USER",
+	"fg:blue",
+	"@",
+	"${hostname}",
+	" ",
+	"c:reset",
 	"fg:yellow",
-	"\n λ "
+	" λ "
 ]

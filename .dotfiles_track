@@ -1,12 +1,8 @@
 .config/fastfetch/
-.config/fuzzel/
 .config/kitty/
 .config/lf/
 .config/mpv/
-.config/niri/
 .config/nvim/
-.config/waybar/
-.config/wlogout/
 .config/distrobox/
 .config/grompt.json
 .local/bin/

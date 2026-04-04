@@ -1,70 +1,35 @@
 return {
     {
-        "OXY2DEV/markview.nvim",
-        lazy = false,
-        dependencies = { "saghen/blink.cmp" },
-    },
-    {
         'nvim-treesitter/nvim-treesitter',
-        version = '^0.10.0',
-        dependencies = { 'OXY2DEV/markview.nvim' },
-        lazy = false,
+        version = '0.10.0',
         build = ':TSUpdate',
+        event = { "BufReadPost", "BufNewFile" },
         main = 'nvim-treesitter.configs',
         opts = {
             ensure_installed = {
-                'bash',
-                'c',
-                'diff',
-                'html',
-                'css',
                 'lua',
                 'luadoc',
-                'markdown',
-                'markdown_inline',
-                'query',
                 'vim',
                 'vimdoc',
-                'go',
-                'javascript',
-                'typescript',
-                'elixir',
-                'erlang',
-                'python',
-                'julia',
             },
             auto_install = true,
             highlight = {
                 enable = true,
-                additional_vim_regex_highlighting = { 'ruby' },
+                additional_vim_regex_highlighting = false,
+                disable = function(lang, buf)
+                    local max_filesize = 100 * 1024 -- 100 KB
+                    local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+                    if ok and stats and stats.size > max_filesize then
+                        return true
+                    end
+                end,
             },
-            indent = { enable = true, disable = { 'ruby' } },
-            incremental_selection = {
-                enable = true,
-                keymaps = {
-                    init_selection = '<CR>',
-                    scope_incremental = '<CR>',
-                    node_incremental = '<TAB>',
-                    node_decremental = '<S-TAB>',
-                },
-            },
+            indent = { enable = false },
         },
     },
     {
-        'windwp/nvim-ts-autotag',
-        dependencies = { 'nvim-treesitter/nvim-treesitter' },
-        event = { 'BufReadPre', 'BufNewFile' },
-        config = function()
-            require('nvim-ts-autotag').setup()
-        end
-    },
-    {
-        'code-biscuits/nvim-biscuits',
-        dependencies = { 'nvim-treesitter/nvim-treesitter' },
-        config = function()
-            require('nvim-biscuits').setup({
-                cursor_line_only = true,
-            })
-        end
+        'nvim-treesitter/nvim-treesitter-context',
+        tag = "v1.0.0",
+        opts = { enable = true, max_lines = 3 },
     }
 }

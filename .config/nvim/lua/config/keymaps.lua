@@ -1,9 +1,6 @@
 -- Key bindings and shortcuts
 local mset = vim.keymap.set
 
--- Explorer
-mset("n", "-", "<CMD>Oil --float<CR>", { desc = "Open parent directory with Oil" })
-
 -- Copy to clipboard
 mset('v', "<leader>y", '"+y')
 

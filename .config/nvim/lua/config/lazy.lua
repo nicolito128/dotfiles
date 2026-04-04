@@ -32,12 +32,11 @@ vim.api.nvim_create_autocmd('BufWritePre', {
   callback = function() vim.lsp.buf.format() end
 })
 
-vim.api.nvim_create_autocmd('BufWritePre', {
-  pattern = '*.go',
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*.go",
   callback = function()
-    vim.cmd('GoFmt')
+    vim.lsp.buf.format({ async = false })
   end,
-  group = format_sync_grp,
 })
 
 -- Cmd

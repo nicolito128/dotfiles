@@ -15,7 +15,7 @@ vim.opt.breakindent = true
 
 -- Always show relative line numbers
 vim.opt.number = true
-vim.opt.relativenumber = false
+vim.opt.relativenumber = true
 
 -- Show line under cursor
 vim.opt.cursorline = true
@@ -45,3 +45,9 @@ vim.opt.list = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 5
+
+-- No match paren
+vim.g.loaded_matchparen = 1
+
+-- Limit shared data
+vim.opt.shada = "'100,<50,s10,h"

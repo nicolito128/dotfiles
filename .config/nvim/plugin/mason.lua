@@ -1,10 +1,10 @@
 vim.pack.add({
 	{
-		src = "https://github.com/mason-org/mason-lspconfig.nvim",
+		src = "https://github.com/mason-org/mason-lspconfig.nvim"
 	},
 	{
-		src = "https://github.com/mason-org/mason.nvim",
-	},
+		src = "https://github.com/mason-org/mason.nvim"
+	}
 })
 
 require("mason").setup({
@@ -14,8 +14,8 @@ require("mason").setup({
 		"clangd",
 		"masonlsp",
 		"bashls",
-		"ts_ls",
-	},
+		"ts_ls"
+	}
 })
 
 require("mason-lspconfig").setup({})

@@ -51,3 +51,6 @@ vim.g.loaded_matchparen = 1
 
 -- Limit shared data
 vim.opt.shada = "'100,<50,s10,h"
+
+-- Timeout for map search
+vim.opt.timeoutlen = 250

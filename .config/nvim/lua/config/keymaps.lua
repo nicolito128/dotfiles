@@ -37,3 +37,6 @@ mset('n', '<leader>d', toggle_diagnostics, { noremap = true, silent = true })
 
 -- Add ; to the end of the line in normal mode
 mset('n', ';;', 'm`A;<Esc>``', { noremap = true, desc = 'Add ; to the end of the line' })
+
+-- 's' key to change a word without replacing the content of the buffer
+mset('n', 's', 'cl', { noremap = true, silent = true })

@@ -2,12 +2,10 @@
 
 export DOTNET_ROOT="$HOME/opt/dotnet"
 export ODIN_USER_PATH="$HOME/opt/odin"
-# export JAVA_USER_JDK_PATH="$HOME/opt/jdk-21/bin"
 
 dirs=(
     "$DOTNET_ROOT"
     "$ODIN_USER_PATH"
-    "$JAVA_USER_JDK_PATH"
 )
 
 # Add to PATH

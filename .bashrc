@@ -109,3 +109,20 @@ fi
 if command -v fastfetch >/dev/null; then
     fastfetch
 fi
+
+# >>> juliaup initialize >>>
+
+# !! Contents within this block are managed by juliaup !!
+
+case ":$PATH:" in
+    *:/home/nicolito/.juliaup/bin:*)
+        ;;
+
+    *)
+        export PATH=/home/nicolito/.juliaup/bin${PATH:+:${PATH}}
+        ;;
+esac
+# Tab completion for juliaup and julia channel selection
+[ -f "/home/nicolito/.julia/juliaup/completions/bash.sh" ] && source "/home/nicolito/.julia/juliaup/completions/bash.sh"
+
+# <<< juliaup initialize <<<

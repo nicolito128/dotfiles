@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 
-export DOTNET_ROOT="$HOME/opt/dotnet"
 export ODIN_USER_PATH="$HOME/opt/odin"
 export FLUTTER_SDK_PATH="$HOME/opt/flutter/bin"
 
 dirs=(
-    "$DOTNET_ROOT"
     "$ODIN_USER_PATH"
     "$FLUTTER_SDK_PATH"
 )

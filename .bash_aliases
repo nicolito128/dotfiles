@@ -9,3 +9,6 @@ alias grep='grep --color=auto'
 
 # IP
 alias myip="echo $(dig +short myip.opendns.com @resolver1.opendns.com)"
+
+# update
+alias upgrade-all='sudo apt update && sudo apt upgrade && flatpak update'

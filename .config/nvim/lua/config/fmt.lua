@@ -1,24 +1,25 @@
+--[[
+local format_sync_grp = vim.api.nvim_create_augroup("GoFormat", {})
+
 vim.api.nvim_create_autocmd("BufWritePre", {
-	pattern = "*",
-	callback = function(args)
-		local bufnr = args.buf
-		local ft = vim.bo[bufnr].filetype
+	pattern = "*.go",
+	callback = function()
+		local params = vim.lsp.util.make_range_params()
+		params.context = { only = { "source.organizeImports" } }
 
-		vim.lsp.buf.format({
-			bufnr = bufnr,
-			async = false,
-			filter = function(client)
-				if not client.supports_method("textDocument/formatting") then
-					return false
+		local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
+		for _, res in pairs(result or {}) do
+			for _, r in pairs(res.result or {}) do
+				if r.edit then
+					vim.lsp.util.apply_workspace_edit(r.edit, "utf-8")
+				else
+					vim.lsp.buf.execute_command(r.command)
 				end
+			end
+		end
 
-				local client_ft = client.config.filetypes or {}
-				for _, filter_ft in ipairs(client_ft) do
-					if filter_ft == ft then return true end
-				end
-
-				return false
-			end,
-		})
+		vim.lsp.buf.format({ async = false })
 	end,
+	group = format_sync_grp,
 })
+--]]

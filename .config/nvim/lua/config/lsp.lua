@@ -30,7 +30,6 @@ vim.diagnostic.config({
 vim.api.nvim_create_autocmd("LspAttach", {
 	group = vim.api.nvim_create_augroup("UserLspConfig", {}),
 	callback = function(ev)
-		-- Opciones para los mapeos del buffer actual
 		local opts = { buffer = ev.buf, remap = false, silent = true }
 
 		-- Go to declaration

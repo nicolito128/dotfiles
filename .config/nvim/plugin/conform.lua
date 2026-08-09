@@ -8,6 +8,7 @@ require("conform").setup({
 	formatters_by_ft = {
 		lua = { "stylua" },
 		go = { "goimports", "gofmt" },
+		c = { "clang-format" },
 		javascript = { "prettier", stop_after_first = true },
 	},
 

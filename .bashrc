@@ -73,6 +73,7 @@ user_bin_dirs=(
     "$HOME/.govm/shim"
     "$HOME/.cargo/env"
     "$HOME/.asdf/shims"
+    "$HOME/.npm-global/bin"
     "$FNM_PATH"
     "$PHP_INI_SCAN_DIR"
     "$PNPM_HOME"
@@ -130,3 +131,4 @@ esac
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+

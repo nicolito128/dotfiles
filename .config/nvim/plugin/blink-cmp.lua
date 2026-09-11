@@ -2,9 +2,11 @@ vim.pack.add({
 	{ src = "https://github.com/zbirenbaum/copilot.lua" },
 	{ src = "https://github.com/giuxtaposition/blink-cmp-copilot" },
 	{ src = "https://github.com/L3MON4D3/LuaSnip" },
-	{ src = "https://github.com/saghen/blink.cmp" },
 	{ src = "https://github.com/rafamadriz/friendly-snippets" },
+	{ src = "https://github.com/saghen/blink.cmp", version = "1.*" },
 })
+
+require("luasnip").setup()
 
 require("copilot").setup({
 	suggestion = { enabled = false },

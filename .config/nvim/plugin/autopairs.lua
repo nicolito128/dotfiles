@@ -5,23 +5,24 @@ vim.pack.add({
 })
 
 require("nvim-autopairs").setup({
-	map_cr = false, -- IMPORTANT: stop autopairs from mapping <CR> itself
+	map_cr = false, -- stop autopairs from mapping <CR> itself
 })
 
--- Chain: blink.cmp accept -> autopairs completion-aware bracket insert -> fallback
 vim.keymap.set("i", "<CR>", function()
 	local blink_ok, blink = pcall(require, "blink.cmp")
 	if blink_ok and blink.is_visible and blink.is_visible() then
-		if blink.accept() then
-			return
-		end
+		vim.schedule(function()
+			blink.accept()
+		end)
+		return
 	end
 
 	local autopairs_ok, autopairs = pcall(require, "nvim-autopairs")
 	if autopairs_ok then
-		return autopairs.autopairs_cr()
+		local keys = autopairs.autopairs_cr()
+		vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(keys, true, true, true), "n", false)
+		return
 	end
 
-	-- final fallback
-	return vim.api.nvim_replace_termcodes("<CR>", true, true, true)
-end, { expr = true, noremap = true })
+	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<CR>", true, true, true), "n", false)
+end, { noremap = true })

@@ -6,6 +6,7 @@ export FLUTTER_SDK_PATH="$HOME/opt/flutter/bin"
 dirs=(
     "$ODIN_USER_PATH"
     "$FLUTTER_SDK_PATH"
+    "$HOME/opt/v"
 )
 
 # Add to PATH

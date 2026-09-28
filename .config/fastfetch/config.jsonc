@@ -44,8 +44,8 @@
                 },
                 {
                         "type": "packages",
-                        "format": "{}",
-                        "key": "pkgs  "
+                        "key": "pkgs  ",
+                        "format": "{dpkg} (apt)"
                 },
                 {
                         "type": "uptime",

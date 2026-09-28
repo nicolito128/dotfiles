@@ -2,7 +2,7 @@
 	"\n",
 	"bg:black",
 	"fg:red",
-	" ↣ ",
+	"↣ ",
 	"${spwd}",
 	" ",
 	"fg:cyan",
@@ -20,10 +20,9 @@
 		]
 	},
 	"c:reset",
-	"\n\n",
 	"bg:black",
 	"fg:green",
-	" Σ ",
+	"Σ ",
 	"$USER",
 	"fg:blue",
 	"@",
@@ -31,5 +30,5 @@
 	" ",
 	"c:reset",
 	"fg:yellow",
-	" λ "
+	"λ "
 ]

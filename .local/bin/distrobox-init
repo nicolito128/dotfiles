@@ -74,7 +74,7 @@ pre_init_hook=""
 rootful=0
 upgrade=0
 verbose=0
-version="1.8.2.2"
+version="1.8.2.5"
 
 # show_help will print usage to stdout.
 # Arguments:
@@ -233,7 +233,13 @@ fi
 #
 # if /run/.nopasswd is present, let's treat the init as rootless, this is not
 # a good thing, users behold!
-if stat /run/host/etc/shadow > /dev/null &&
+#
+# if /run/.distrobox.rootless is present, the container was explicitly created
+# without --root (distrobox-create mounts this marker for rootless containers).
+# Trust it over the shadow heuristic, which gives false positives on Docker
+# Desktop (macOS) where the container always has root access to the VM's fs.
+if [ ! -e /run/.distrobox.rootless ] &&
+	stat /run/host/etc/shadow > /dev/null &&
 	{
 		[ "$(stat -c "%u" /run/host/etc/shadow)" = "0" ] || [ "$(stat -f "%u" /run/host/etc/shadow 2> /dev/null)" = "0" ]
 	} &&
@@ -640,7 +646,9 @@ setup_apk()
 			man-db
 			mesa
 			openssh-client
+			pinentry
 			posix-libc-utils
+			script
 		"
 	elif apk add alpine-base; then
 		deps="
@@ -967,9 +975,21 @@ setup_aptrpm()
 		control sudo public
 		control sudoreplay public
 		control su wheel
-		mkdir /etc/tcb/"${container_user_name}"
+		control pam_mktemp disabled
+		mkdir -p /etc/tcb/"${container_user_name}"
 		echo "${container_user_name}::::::::" > /etc/tcb/"${container_user_name}"/shadow
 		sed -i 's/*//g' /etc/passwd
+
+		# ALT Linux ships its own su incompatible with util-linux su flags.
+		# distrobox-enter passes flags like -m, --pty, -s, -c which ALT su rejects.
+		# runuser (from util-linux, always present) accepts the same flags.
+		# Place the wrapper in /usr/local/bin so it is found before /bin/su.
+		mkdir -p /usr/local/bin
+		cat << 'EOF' > /usr/local/bin/su
+#!/bin/sh
+exec /usr/sbin/runuser "$@"
+EOF
+		chmod +x /usr/local/bin/su
 	fi
 
 	# In case the locale is not available, install it
@@ -1073,8 +1093,10 @@ setup_dnf()
 		tzdata
 		unzip
 		util-linux
+		util-linux-script
 		vte-profile
 		wget
+		wget2-wget
 		which
 		whois
 		words
@@ -1620,8 +1642,17 @@ setup_zypper()
 	# poor out-of-the-box experience (e.g., when trying to run GUI apps).
 	# So, let's enable them. For the same reason, we make sure we install
 	# docs.
-	sed -i 's/.*solver.onlyRequires.*/solver.onlyRequires = false/g' /etc/zypp/zypp.conf
-	sed -i 's/.*rpm.install.excludedocs.*/rpm.install.excludedocs = no/g' /etc/zypp/zypp.conf
+	if [ -d /etc/zypp/zypp.conf.d ]; then
+		cat << EOF > /etc/zypp/zypp.conf.d/99-distrobox.conf
+[main]
+solver.onlyRequires = false
+rpm.install.excludedocs = no
+EOF
+	else
+		sed -i 's/.*solver.onlyRequires.*/solver.onlyRequires = false/g' /etc/zypp/zypp.conf
+		sed -i 's/.*rpm.install.excludedocs.*/rpm.install.excludedocs = no/g' /etc/zypp/zypp.conf
+	fi
+
 	# With recommended packages, something might try to pull in
 	# parallel-printer-support which can't be installed in rootless containers.
 	# Since we very much likely never need it, just lock it
@@ -1701,45 +1732,56 @@ setup_zypper()
 	fi
 }
 
-# Check dependencies in a list, and install all if one is missing
-missing_packages=0
-dependencies="
-	bc
-	bzip2
-	chpasswd
-	curl
-	diff
-	find
-	findmnt
-	gpg
-	hostname
-	less
-	lsof
-	man
-	mount
-	passwd
-	pigz
-	pinentry
-	ping
-	ps
-	rsync
-	script
-	ssh
-	sudo
-	time
-	tree
-	umount
-	unzip
-	useradd
-	wc
-	wget
-	xauth
-	zip
-	${shell_pkg}
-"
-for dep in ${dependencies}; do
-	! command -v "${dep}" > /dev/null && missing_packages=1 && break
-done
+# Check if all commands are installed.
+# Arguments:
+#   None
+# Expected global variables:
+#   shell_pkg: shell package of the container shell
+# Expected env variables:
+#   None
+# Outputs:
+#   None
+check_missing_packages()
+{
+	dependencies="
+		bc
+		bzip2
+		chpasswd
+		curl
+		diff
+		find
+		findmnt
+		gpg
+		hostname
+		less
+		lsof
+		man
+		mount
+		passwd
+		pigz
+		pinentry
+		ping
+		ps
+		rsync
+		script
+		ssh
+		sudo
+		time
+		tree
+		umount
+		unzip
+		useradd
+		wc
+		wget
+		xauth
+		zip
+		${shell_pkg}
+	"
+	for dep in ${dependencies}; do
+		! command -v "${dep}" && return 1
+	done
+	return 0
+}
 
 # Ensure we have the least minimal path of standard Linux File System set
 PATH="${PATH}:/bin:/sbin:/usr/bin:/usr/sbin"
@@ -1766,11 +1808,7 @@ elif command -v yum; then
 fi
 
 # Check if dependencies are met for the script to run.
-if [ "${upgrade}" -ne 0 ] ||
-	[ "${missing_packages}" -ne 0 ] ||
-	{
-		[ -n "${container_additional_packages}" ] && [ ! -e /.containersetupdone ]
-	}; then
+if [ "${upgrade}" -ne 0 ] || [ ! -e /.containersetupdone ]; then
 
 	# Detect the available package manager
 	# install minimal dependencies needed to bootstrap the container:
@@ -1805,8 +1843,12 @@ if [ "${upgrade}" -ne 0 ] ||
 		# Exit as command not found
 		exit 127
 	fi
-
-	touch /.containersetupdone
+	if [ ! -e /.containersetupdone ]; then
+		if ! check_missing_packages; then
+			printf "Warning: some dependencies are missing.\n"
+		fi
+		touch /.containersetupdone
+	fi
 fi
 
 # Set SHELL to the install path inside the container
@@ -1840,8 +1882,10 @@ fi
 # This won't work well on very old distros with su version from util-linux
 # before version 2.34 or other su implementations but will give an usable
 # shell nonetheless
-if ! su --version | grep -q util-linux ||
-	su --version | awk '{printf  "%s\n%s", $4, 2.34}' | sort --check=quiet --version-sort; then
+if [ ! -e /usr/local/bin/su ] && {
+	! su --version | grep -q util-linux ||
+		su --version | awk '{printf  "%s\n%s", $4, 2.34}' | sort --check=quiet --version-sort
+}; then
 	cat << EOF > /usr/local/bin/su
 #!/bin/sh
 
@@ -1922,6 +1966,7 @@ printf "distrobox: Setting up host's sockets integration...\n"
 # for example using `podman --remote` to control the host's podman from inside
 # the container or accessing docker and libvirt sockets.
 host_sockets="$(find /run/host/run \
+	-xdev \
 	-path /run/host/run/media -prune -o \
 	-path /run/host/run/timeshift -prune -o \
 	-name 'user' -prune -o \
@@ -1939,7 +1984,7 @@ host_sockets="$(find /run/host/run \
 # create many problems with package managers thinking they have access to
 # system dbus, user auth cache misused or query wrong user information.
 for host_socket in ${host_sockets}; do
-	container_socket="$(printf "%s" "${host_socket}" | sed 's|/run/host||g')"
+	container_socket="${host_socket#/run/host}"
 	# Check if the socket already exists or the symlink already exists
 	if [ ! -S "${container_socket}" ] && [ ! -L "${container_socket}" ]; then
 		# link it.
@@ -1959,7 +2004,9 @@ if [ "${nvidia}" -eq 1 ]; then
 	# Refresh ldconfig cache, also detect if there are empty files remaining
 	# and clean them.
 	# This could happen when upgrading drivers and changing versions.
-	find /usr/lib* -empty -iname "*.so.*" -exec sh -c 'rm -rf "$1" || umount "$1" && rm -rf "$1"' sh {} ';' || :
+	# Use "*.so*" instead of "*.so.*" to also match unversioned .so stubs
+	# (e.g. libcuda.so, libnvcuvid.so) that block CUDA detection. See #1764.
+	find /usr/lib* -empty -iname "*.so*" -exec sh -c 'rm -rf "$1" || umount "$1" && rm -rf "$1"' sh {} ';' || :
 	find /usr/ /etc/ -empty -iname "*nvidia*" -exec sh -c 'rm -rf "$1" || umount "$1" && rm -rf "$1"' sh {} ';' || :
 
 	# First we find all generic config files we might need
@@ -2343,7 +2390,7 @@ if ! grep -q "^${container_user_name}:" /etc/group; then
 	if ! groupadd --force --gid "${container_user_gid}" "${container_user_name}"; then
 		# It may occur that we have users with unsupported user name (eg. on LDAP or AD)
 		# So let's try and force the group creation this way.
-		printf "%s:x:%s:" "${container_user_name}" "${container_user_gid}" >> /etc/group
+		printf "%s:x:%s:\n" "${container_user_name}" "${container_user_gid}" >> /etc/group
 	fi
 fi
 ###############################################################################
@@ -2405,7 +2452,7 @@ if ! grep -q "^$(printf '%s' "${container_user_name}" | tr '\\' '.'):" /etc/pass
 
 		printf "Warning: There was a problem setting up the user with usermod, trying manual addition\n"
 
-		printf "%s:x:%s:%s:%s:%s:%s" \
+		printf "%s:x:%s:%s:%s:%s:%s\n" \
 			"${container_user_name}" "${container_user_uid}" \
 			"${container_user_gid}" "${container_user_name}" \
 			"${container_user_home}" "${SHELL:-"/bin/bash"}" >> /etc/passwd
@@ -2418,47 +2465,85 @@ elif [ ! -e /etc/passwd.done ]; then
 	# for us inside container. We should modify the user's prepopulated shadowfile
 	# entry though as per user's active preferences.
 
-	# If the user was there with a different username, get that username so
-	# we can modify it
-	if ! grep -q "^$(printf '%s' "${container_user_name}" | tr '\\' '.'):" /etc/passwd; then
-		user_to_modify=$(getent passwd "${container_user_uid}" | cut -d: -f1)
+	# Get current user attributes using container_user_uid as the reference
+	# (script runs as root, so we must look up the target user by UID)
+	current_user_entry=$(getent passwd "${container_user_uid}")
+	current_user_name=$(printf '%s' "${current_user_entry}" | cut -d: -f1)
+	current_shell=$(printf '%s' "${current_user_entry}" | cut -d: -f7)
+	current_gid=$(printf '%s' "${current_user_entry}" | cut -d: -f4)
+	current_groups=$(id -nG "${current_user_name}" 2> /dev/null)
+
+	# Modify username if needed
+	if [ "${current_user_name}" != "${container_user_name}" ]; then
+		printf "distrobox: Setting up existing user - username...\n"
+		if ! usermod --login "${container_user_name}" "${current_user_name}"; then
+			printf "Warning: usermod --login failed, trying manual modification\n"
+			sed -i "s|^${current_user_name}:|${container_user_name}:|g" /etc/passwd
+			if ! getent passwd "${container_user_name}" > /dev/null 2>&1; then
+				printf "Error: Failed to modify user login name\n" >&2
+				exit 1
+			fi
+		fi
+		# Update current_user_name for subsequent commands
+		current_user_name="${container_user_name}"
 	fi
 
-	printf "distrobox: Setting up existing user...\n"
-	if ! usermod \
-		--home "${container_user_home}" \
-		--shell "${SHELL:-"/bin/bash"}" \
-		--groups "${additional_groups}" \
-		--uid "${container_user_uid}" \
-		--gid "${container_user_gid}" \
-		--login "${container_user_name}" \
-		"${user_to_modify:-"${container_user_name}"}"; then
+	# Modify shell if needed
+	if [ "${current_shell}" != "${SHELL:-"/bin/bash"}" ]; then
+		printf "distrobox: Setting up existing user - shell...\n"
+		if ! usermod --shell "${SHELL:-"/bin/bash"}" "${current_user_name}"; then
+			printf "Warning: usermod --shell failed, trying manual modification\n"
+			# sed to update shell field (7th field) in /etc/passwd
+			sed -i "s|^\(${current_user_name}:[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:\).*|\1${SHELL:-"/bin/bash"}|g" /etc/passwd
+		fi
+	fi
 
-		printf "Warning: There was a problem setting up the user with usermod, trying manual addition\n"
+	# Modify GID if needed
+	if [ "${current_gid}" != "${container_user_gid}" ]; then
+		printf "distrobox: Setting up existing user - GID...\n"
+		if ! usermod --gid "${container_user_gid}" "${current_user_name}"; then
+			printf "Warning: usermod --gid failed, trying manual modification\n"
+			# sed to update gid field (4th field) in /etc/passwd
+			sed -i "s|^\(${current_user_name}:[^:]*:[^:]*:\)[^:]*|\1${container_user_gid}|g" /etc/passwd
+		fi
+	fi
 
-		# Modify the user
-		printf "distrobox: Setting up existing user: /etc/passwd...\n"
-		sed -i "s|^${container_user_name}.*||g" /etc/passwd
-		printf "%s:x:%s:%s:%s:%s:%s" \
-			"${container_user_name}" "${container_user_uid}" \
-			"${container_user_gid}" "${container_user_name}" \
-			"${container_user_home}" "${SHELL:-"/bin/bash"}" >> /etc/passwd
-
-		# Add or modify the default group
-		# and add or modify the additional groups
-		printf "distrobox: Setting up existing user: /etc/group...\n"
-		for group in ${container_user_name} ${additional_groups}; do
-			# Check if we have the user in the group
-			if ! grep -q "^${group}.*${container_user_name}.*" /etc/group; then
-				group_line="$(grep "^${group}.*" /etc/group)"
-				# If no users in the group just add it
-				if grep -q "^${group}.*:$" /etc/group; then
-					sed -i "s|${group_line}|${group_line}${container_user_name}|g" /etc/group
-				else
-					sed -i "s|${group_line}|${group_line},${container_user_name}|g" /etc/group
+	# Modify groups if needed (check if user is missing from any additional group)
+	groups_need_modification=0
+	for group in ${additional_groups}; do
+		if ! printf '%s' " ${current_groups} " | grep -q " ${group} "; then
+			groups_need_modification=1
+			break
+		fi
+	done
+	if [ "${groups_need_modification}" -eq 1 ]; then
+		printf "distrobox: Setting up existing user - groups...\n"
+		# Workaround: usermod --groups fails if an /etc/group file does not end with
+		# a newline, so we preemptively add one just in case.
+		printf '\n' >> /etc/group
+		if ! usermod --append --groups "${additional_groups}" "${current_user_name}"; then
+			printf "Warning: usermod --groups failed, trying manual modification\n"
+			for group in ${additional_groups}; do
+				if ! grep -q "^${group}.*${current_user_name}.*" /etc/group; then
+					group_line="$(grep "^${group}.*" /etc/group)"
+					if grep -q "^${group}.*:$" /etc/group; then
+						sed -i "s|${group_line}|${group_line}${current_user_name}|g" /etc/group
+					else
+						sed -i "s|${group_line}|${group_line},${current_user_name}|g" /etc/group
+					fi
 				fi
-			fi
-		done
+			done
+		fi
+	fi
+
+	# Modify UID if needed
+	current_uid=$(getent passwd "${current_user_name}" | cut -d: -f3)
+	if [ "${current_uid}" != "${container_user_uid}" ]; then
+		printf "distrobox: UID...\n"
+		if ! usermod --uid "${container_user_uid}" "${current_user_name}"; then
+			printf "Warning: usermod --uid failed, trying manual modification\n"
+			sed -i "s|^\(${current_user_name}:[^:]*:\)[^:]*|\1${container_user_uid}|g" /etc/passwd
+		fi
 	fi
 fi
 
@@ -2478,8 +2563,12 @@ if [ ! -e /etc/passwd.done ]; then
 	temporary_password="$(md5sum < /proc/sys/kernel/random/uuid | cut -d' ' -f1)"
 	# We generate a random password to initialize the entry for the user.
 	chpasswd_failed=0
-	printf "%s:%s" "${container_user_name}" "${temporary_password}" | chpasswd -e || chpasswd_failed=1
-	printf "%s:" "${container_user_name}" | chpasswd -e || chpasswd_failed=1
+	printf "%s:%s" "${container_user_name}" "${temporary_password}" | chpasswd || chpasswd_failed=1
+	# Then we remove the password for current user
+	if ! passwd -d "${container_user_name}"; then
+		# Fallback to chpasswd for older systems without passwd -d
+		printf "%s:" "${container_user_name}" | chpasswd || chpasswd_failed=1
+	fi
 
 	if [ "${chpasswd_failed}" -eq 1 ]; then
 		printf "Warning: There was a problem setting up the user, trying manual addition\n"
@@ -2497,7 +2586,10 @@ if [ ! -e /etc/passwd.done ]; then
 			passwd_cmd="passwd --stdin"
 		fi
 		printf "%s\n%s\n" "${temporary_password}" "${temporary_password}" | ${passwd_cmd} root
-		printf "%s:" "root" | chpasswd -e
+		if ! passwd -d "root"; then
+			# Fallback to chpasswd for older systems without passwd -d
+			printf "%s:" "root" | chpasswd
+		fi
 	else
 		# We're rootful, so we don't want passwordless accounts, so we lock them
 		# down by default.
@@ -2531,6 +2623,13 @@ fi
 
 # Now we're done
 touch /etc/passwd.done
+
+# Ensure shadow files are readable by root without relying on CAP_DAC_OVERRIDE,
+# which may not be effective on all container storage drivers (e.g. fuse-overlayfs
+# in rootless mode, or VMs like Docker Desktop / Colima on macOS).
+# Fedora/Arch ship these as mode 000, expecting the capability to bypass DAC.
+chmod 0400 /etc/shadow 2> /dev/null || :
+chmod 0400 /etc/gshadow 2> /dev/null || :
 ###############################################################################
 
 ###############################################################################

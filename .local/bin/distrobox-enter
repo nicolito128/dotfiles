@@ -109,7 +109,7 @@ headless=0
 skip_workdir=0
 verbose=0
 clean_path=0
-version="1.8.2.2"
+version="1.8.2.5"
 
 # Source configuration files, this is done in an hierarchy so local files have
 # priority over system defaults
@@ -423,6 +423,8 @@ generate_enter_command()
 	result_command="${result_command}
 		--workdir=${workdir}"
 	result_command="${result_command}
+		--env=PWD=${workdir}"
+	result_command="${result_command}
 		--env=CONTAINER_ID=${container_name}"
 	result_command="${result_command}
 		--env=DISTROBOX_ENTER_PATH=${distrobox_enter_path}"
@@ -437,7 +439,7 @@ generate_enter_command()
 	# and needs to stay that way to use custom home dirs. or it will be too talkative.
 	result_command="${result_command}
 		$(printenv | grep '=' | grep -Ev '"|`|\$' |
-		grep -Ev '^(CONTAINER_ID|FPATH|HOST|HOSTNAME|HOME|PATH|PROFILEREAD|SHELL|XDG_SEAT|XDG_VTNR|XDG_.*_DIRS|^_)' |
+		grep -Ev '^(CONTAINER_ID|FPATH|HOST|HOSTNAME|HOME|PATH|PROFILEREAD|PWD|SHELL|XDG_SEAT|XDG_VTNR|XDG_.*_DIRS|^_)' |
 		sed 's/ /\ /g' | sed 's/^\(.*\)$/--env=\1/g')"
 
 	# Start with the $PATH set in the container's config
@@ -472,6 +474,42 @@ generate_enter_command()
 		else
 			container_paths="${PATH}"
 		fi
+
+		# Ensure /usr/local/{s,}bin appears before /usr/{s,}bin in PATH.
+		# This follows FHS conventions: /usr/local should override /usr,
+		# and ensures distrobox wrappers in /usr/local/bin are found first.
+		reordered_paths=""
+		IFS_OLD="${IFS}"
+		IFS=":"
+		for p in ${container_paths}; do
+			case "${p}" in
+				/usr/local/bin | /usr/local/sbin)
+					# skip, will be re-inserted before their /usr counterpart
+					;;
+				/usr/bin)
+					# insert /usr/local/bin right before /usr/bin
+					reordered_paths="${reordered_paths:+${reordered_paths}:}/usr/local/bin:${p}"
+					;;
+				/usr/sbin)
+					# insert /usr/local/sbin right before /usr/sbin
+					reordered_paths="${reordered_paths:+${reordered_paths}:}/usr/local/sbin:${p}"
+					;;
+				*)
+					reordered_paths="${reordered_paths:+${reordered_paths}:}${p}"
+					;;
+			esac
+		done
+		IFS="${IFS_OLD}"
+
+		# If /usr/bin or /usr/sbin were not in PATH, the corresponding
+		# /usr/local paths were skipped above. Re-add them if missing.
+		for lp in /usr/local/bin /usr/local/sbin; do
+			pattern="(:|^)${lp}(:|$)"
+			if ! echo "${reordered_paths}" | grep -Eq "${pattern}"; then
+				reordered_paths="${lp}:${reordered_paths}"
+			fi
+		done
+		container_paths="${reordered_paths}"
 	fi
 
 	result_command="${result_command}
@@ -540,6 +578,75 @@ generate_enter_command()
 container_home="${HOME}"
 container_path="${PATH}"
 unshare_groups=0
+
+# Read the unshare_groups label early so the positional-parameter
+# manipulation below picks the correct branch. The full inspect
+# happens later, but this single value is needed before then.
+unshare_groups="$(${container_manager} inspect --type container \
+	--format '{{ index .Config.Labels "distrobox.unshare_groups" }}' \
+	"${container_name}" 2> /dev/null || echo 0)"
+[ -z "${unshare_groups}" ] && unshare_groups=0
+
+################################################################################
+# In this section we will manipulate the positional parameters
+# in order to generate our long docker/podman/lilipod command to execute.
+#
+# We use positional parameters in order to have the shell manage escaping and spaces
+# so we remove the problem of we having to handle them.
+#
+# 1 - handle absence of custom command, we will need to add a getent command to
+#     execute the right container's user's shell
+# 2 - in case of unshared groups (or initful) we need to trigger a proper login
+#     using `su`, so we will need to manipulate these arguments accorodingly
+# 3 - prepend our generated command
+#     to do this, we use `tac` so we reverse loop it and prepend each argument.
+# 4 - now that we're done, we can prepend our container_command
+#     we will need to use `rev` to reverse it as we reverse loop and prepend each
+#     argument
+################################################################################
+#
+# Setup default commands if none are specified
+# execute a getent command using the /bin/sh shell
+# to find out the default shell of the user, and
+# do a login shell with it (eg: /bin/bash -l)
+if [ "${container_custom_command}" -eq 0 ]; then
+	set - "$@" "/bin/sh" "-c" "\$(getent passwd '${container_command_user}' | cut -f 7 -d :) -l"
+fi
+
+# If we have a command and we're unsharing groups, we need to execute those
+# command using su $container_command_user
+# if we're in a tty, also allocate one
+if [ "${unshare_groups:-0}" -eq 1 ]; then
+	# `su` requires options BEFORE the username:
+	#     su [options] -- user [args...]
+	# The literal `--` is required because util-linux `su` uses GNU getopt
+	# with argument reordering: without it, any flag in the user's command
+	# (e.g. `uname -n`) is parsed as a `su` option and fails.
+	# The shell snippet '"$0" "$@"' re-executes its arguments verbatim,
+	# so `args...` become the actual command to run as the target user.
+	set -- "${container_command_user}" "$@"
+	set -- "--" "$@"
+	# shellcheck disable=SC2089,SC2016
+	set -- "-c" '"$0" "$@"' "$@"
+	set -- "-s" "/bin/sh" "$@"
+	if [ "${headless}" -eq 0 ]; then
+		set -- "--pty" "$@"
+	fi
+	set -- "-m" "$@"
+	set -- "su" "$@"
+fi
+
+################################################################################
+# Execution section
+################################################################################
+
+# dry run mode, just generate the command and print it. No execution.
+if [ "${dryrun}" -ne 0 ]; then
+	cmd="$(generate_enter_command | sed 's/\t//g')"
+	printf "%s %s\n" "${cmd}" "$*"
+	exit 0
+fi
+
 # Now inspect the container we're working with.
 container_status="unknown"
 eval "$(${container_manager} inspect --type container --format \
@@ -548,13 +655,6 @@ eval "$(${container_manager} inspect --type container --format \
 	{{range .Config.Env}}{{if and (ge (len .) 5) (eq (slice . 0 5) "HOME=")}}container_home={{slice . 5 | printf "%q"}}{{end}}{{end}};
 	{{range .Config.Env}}{{if and (ge (len .) 5) (eq (slice . 0 5) "PATH=")}}container_path={{slice . 5 | printf "%q"}}{{end}}{{end}}' \
 	"${container_name}")"
-
-# dry run mode, just generate the command and print it. No execution.
-if [ "${dryrun}" -ne 0 ]; then
-	cmd="$(generate_enter_command | sed 's/\t//g')"
-	printf "%s %s\n" "${cmd}" "$*"
-	exit 0
-fi
 
 # Check if the container is even there
 if [ "${container_status}" = "unknown" ]; then
@@ -665,47 +765,6 @@ if [ "${container_status}" != "running" ]; then
 	# cleanup fifo
 	rm -f "${app_cache_dir}/.${container_name}.fifo"
 	printf >&2 "\nContainer Setup Complete!\n"
-fi
-
-################################################################################
-# Execution section, in this section we will manipulate the positional parameters
-# in order to generate our long docker/podman/lilipod command to execute.
-#
-# We use positional parameters in order to have the shell manage escaping and spaces
-# so we remove the problem of we having to handle them.
-#
-# 1 - handle absence of custom command, we will need to add a getent command to
-#     execute the right container's user's shell
-# 2 - in case of unshared groups (or initful) we need to trigger a proper login
-#     using `su`, so we will need to manipulate these arguments accorodingly
-# 3 - prepend our generated command
-#     to do this, we use `tac` so we reverse loop it and prepend each argument.
-# 4 - now that we're done, we can prepend our container_command
-#     we will need to use `rev` to reverse it as we reverse loop and prepend each
-#     argument
-################################################################################
-#
-# Setup default commands if none are specified
-# execute a getent command using the /bin/sh shell
-# to find out the default shell of the user, and
-# do a login shell with it (eg: /bin/bash -l)
-if [ "${container_custom_command}" -eq 0 ]; then
-	set - "$@" "/bin/sh" "-c" "\$(getent passwd '${container_command_user}' | cut -f 7 -d :) -l"
-fi
-
-# If we have a command and we're unsharing groups, we need to execute those
-# command using su $container_command_user
-# if we're in a tty, also allocate one
-if [ "${unshare_groups:-0}" -eq 1 ]; then
-	# shellcheck disable=SC2089,SC2016
-	set -- "-c" '"$0" "$@"' -- "$@"
-	set -- "-s" "/bin/sh" "$@"
-	if [ "${headless}" -eq 0 ]; then
-		set -- "--pty" "$@"
-	fi
-	set -- "-m" "$@"
-	set -- "${container_command_user}" "$@"
-	set -- "su" "$@"
 fi
 
 # Generate the exec command and run it

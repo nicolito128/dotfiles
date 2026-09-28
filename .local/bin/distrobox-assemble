@@ -38,7 +38,7 @@ root_flag=""
 tmpfile="$(mktemp -u)"
 tmp_download_file="$(mktemp -u)"
 verbose=0
-version="1.8.2.2"
+version="1.8.2.5"
 # initializing block of variables used in the manifest
 additional_flags=""
 additional_packages=""
@@ -466,13 +466,16 @@ run_distrobox()
 			result_command="${result_command} --additional-flags $(sanitize_variable "${flag}")"
 		done
 	fi
+	if [ "${dryrun}" -ne 0 ]; then
+		result_command="${result_command} --dry-run"
+	fi
 
 	# Execute the distrobox-create command
+	eval "${result_command}"
+
 	if [ "${dryrun}" -ne 0 ]; then
-		echo "${result_command}"
 		return
 	fi
-	eval "${result_command}"
 
 	# If we need to start immediately, do it, so that the container
 	# is ready to be entered.
@@ -789,5 +792,5 @@ replace_line()
 
 # Exec
 expanded_file=$(mktemp -u)
-resolve_includes "${input_file}" "${expanded_file}"
+resolve_includes "${input_file}" "${expanded_file}" > /dev/null
 parse_file "${expanded_file}"
